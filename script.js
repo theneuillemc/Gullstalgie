@@ -296,12 +296,18 @@ function renderMediaSync(media, seekOffset) {
             e.target.setPlaybackQuality('hd1080');
             e.target.seekTo(seekOffset, true);
             e.target.playVideo();
+            if (typeof e.target.unloadModule === "function") {
+              e.target.unloadModule("captions");
+            }
           },
           onStateChange: (e) => {
             if (e.data === YT.PlayerState.PLAYING) {
               clearTimeout(safetyTimer);
               e.target.setPlaybackQuality('hd1080');
               fallbackBtn.style.display = "none";
+              if (typeof e.target.unloadModule === "function") {
+                e.target.unloadModule("captions");
+              }
             }
             if (e.data === YT.PlayerState.ENDED) {
               handleMediaEnded();
