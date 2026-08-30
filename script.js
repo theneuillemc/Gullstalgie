@@ -294,12 +294,14 @@ function renderMediaSync(media, seekOffset) {
         events: {
           onReady: (e) => {
             clearTimeout(safetyTimer);
+            e.target.setPlaybackQuality('hd1080'); // Forcer le 1080p
             e.target.seekTo(seekOffset, true);
             e.target.playVideo();
           },
           onStateChange: (e) => {
             if (e.data === YT.PlayerState.PLAYING) {
               clearTimeout(safetyTimer);
+              e.target.setPlaybackQuality('hd1080'); // S'assurer qu'au lancement c'est forcé
               fallbackBtn.style.display = "none";
             }
             if (e.data === YT.PlayerState.ENDED) {
@@ -325,7 +327,7 @@ function renderMediaSync(media, seekOffset) {
   } else {
     const ytId = extractYoutubeId(media.url);
     const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&start=${Math.floor(seekOffset)}`;
+    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&vq=hd1080&start=${Math.floor(seekOffset)}`;
     iframe.style.cssText = "width:100%;height:100%;border:0;";
     refs.mediaStage.appendChild(iframe);
   }
