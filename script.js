@@ -27,7 +27,7 @@ const state = {
   adminChainEnd: null,
   ytPlayer: null,
   currentMediaUrl: null,
-  subtitlesEnabled: false // Par défaut désactivés
+  subtitlesEnabled: false
 };
 
 const refs = {
@@ -234,20 +234,15 @@ function handleMediaEnded() {
   updateDirectSync();
 }
 
-// Fonction pour appliquer l'état des sous-titres sur le lecteur YouTube
 function applySubtitlesState() {
   if (state.ytPlayer && typeof state.ytPlayer.loadModule === "function") {
     if (state.subtitlesEnabled) {
       state.ytPlayer.loadModule("captions");
       try {
-        const track = state.ytPlayer.getOption("captions", "track");
-        if (!track || !track.languageCode) {
-          // Force le français si disponible
-          const tracks = state.ytPlayer.getOption("captions", "tracklist");
-          if (tracks && tracks.length > 0) {
-            const frTrack = tracks.find(t => t.languageCode === 'fr') || tracks[0];
-            state.ytPlayer.setOption("captions", "track", frTrack);
-          }
+        const tracks = state.ytPlayer.getOption("captions", "tracklist");
+        if (tracks && tracks.length > 0) {
+          const frTrack = tracks.find(t => t.languageCode === 'fr') || tracks[0];
+          state.ytPlayer.setOption("captions", "track", frTrack);
         }
       } catch (e) {}
     } else {
@@ -379,14 +374,13 @@ function startProgram() {
   updateDirectSync();
 }
 
-// Création et injection du bouton de sous-titres en haut à gauche
 function initSubtitlesButton() {
   const subBtn = document.createElement("button");
   subBtn.id = "toggle-subtitles-btn";
   subBtn.textContent = "💬 Sous-titres : OFF";
   subBtn.style.cssText = `
     position: fixed;
-    top: 15px;
+    top: 75px;
     left: 15px;
     z-index: 10000;
     background: rgba(0, 0, 0, 0.75);
