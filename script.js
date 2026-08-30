@@ -2,7 +2,6 @@
 // 📌 LISTE DES PROGRAMMES DE BASE (Gullstalgie)
 // =================================================================
 const MES_LIENS = [
-    { id: "oggy", title: "Oggy et les Cafards - Coquilles en stock", url: "https://archive.org/download/oggy-et-les-cafards-coquilles-en-stock-s-01-e-46-episode-complet-en-hd/Oggy%20et%20les%20Cafards%20-%20Coquilles%20en%20stock%20%28S01E46%29%20-%20Episode%20complet%20en%20HD.mp4", duration: 420, isArchive: true },
     { id: "oggy", title: "Oggy et les Cafards - Compil", url: "https://www.youtube.com/watch?v=d0b4rOQYA3s", duration: 1320 },
     { id: "zig1", title: "Zig et Sharko - Compil 1", url: "https://www.youtube.com/watch?v=PQwwHx-oMLQ", duration: 1320 },
     { id: "zig2", title: "Zig et Sharko - Compil 2", url: "https://youtu.be/Tth57ZeRT2M", duration: 1320 },
