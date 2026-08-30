@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gullstalgie TV</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Bouton admin unique en haut à droite -->
+    <button id="open-admin-btn" type="button">⚙️ Admin</button>
+
+    <header class="gulli-header">
+      <div class="gulli-logo-container">
+        <div class="gulli-logo">gullstalgie</div>
+      </div>
+    </header>
+
+    <div id="app" class="gulli-layout">
+      <main class="tv-shell">
+        <div class="tv-frame">
+          <div class="tv-topbar">
+            <div class="brand-block">
+              <span class="brand-dot"></span>
+            </div>
+            <div id="clock" class="tv-clock">00:00</div>
+          </div>
+
+          <div class="screen-wrap">
+            <div id="screen" class="screen">
+              <div id="media-stage" aria-live="polite"></div>
+              <!-- Couche invisible bloquant l'interaction avec le lecteur -->
+              <div class="tv-lock-overlay"></div>
+              <div class="tv-overlay"></div>
+              
+              <div id="start-screen" class="start-screen">
+                <div class="start-card">
+                  <div class="logo-mini">GULLSTALGIE</div>
+                  <h1>Bienvenue sur Gullstalgie</h1>
+                  <p>Le direct synchronisé des dessins animés et pubs des années 2000 !</p>
+                  <button id="start-button" type="button">Rejoindre le direct</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="tv-footer">
+            <div class="footer-left">
+              <span class="footer-label">En direct</span>
+              <span class="footer-channel">Gullstalgie Live</span>
+            </div>
+            <div class="ticker-wrap">
+              <div class="ticker-track" id="ticker-text">
+                Gullstalgie • Le flux direct pour tous à la même heure • Dessins animés cultes • Pubs vintage •
+              </div>
+            </div>
+          </footer>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modale Panneau Admin Sécurisé -->
+    <div id="admin-panel-overlay" class="hidden">
+      <div class="admin-box">
+        <div class="admin-box-header">
+          <span>🛠️ Centre de Contrôle — Gullstalgie</span>
+          <button class="close-admin" id="close-admin-btn" type="button">&times;</button>
+        </div>
+
+        <div class="admin-box-content">
+          <div id="admin-login-container" class="admin-section">
+            <h3>Accès Sécurisé</h3>
+            <p style="font-size:0.85rem; color:#333; margin-bottom:8px;">Entrez le code secret</p>
+            <div style="display:flex; gap:8px;">
+              <input type="password" id="admin-pass-input" placeholder="Code secret...">
+              <button id="admin-login-btn" class="adm-btn" type="button" style="width:auto; text-align:center;">Valider</button>
+            </div>
+            <p id="admin-error-msg" style="color:#c00; font-size:0.8rem; display:none; margin-top:6px; font-weight:bold;">Code incorrect !</p>
+          </div>
+
+          <div id="admin-controls-container" style="display:none;">
+            <div class="admin-section">
+              <h3>⚡ Actions Flux Direct</h3>
+              <div class="admin-grid">
+                <button id="adm-restart-btn" class="adm-btn danger" type="button">🔄 Resynchroniser le Direct</button>
+                <button id="adm-clear-storage-btn" class="adm-btn danger" type="button">🗑️ Vider le Cache</button>
+              </div>
+            </div>
+
+            <div class="admin-section">
+              <h3>⏰ Simulation Temporelle</h3>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div>
+                  <label class="admin-label">Forcer une heure précise :</label>
+                  <div style="display:flex; gap:8px; margin-top:4px;">
+                    <input type="time" id="adm-time-input">
+                    <button id="adm-apply-time" class="adm-btn" type="button" style="width:auto;">Appliquer</button>
+                    <button id="adm-reset-time" class="adm-btn" type="button" style="width:auto;">Temps réel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-section">
+              <h3>🔊 Diagnostics</h3>
+              <div class="admin-grid">
+                <button id="adm-toggle-mute" class="adm-btn" type="button">🔇 Couper/Activer le Son</button>
+                <button id="adm-log-state" class="adm-btn" type="button">📋 État dans la Console</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
