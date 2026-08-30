@@ -1,5 +1,5 @@
 // =================================================================
-// 📌 LISTE DES PROGRAMMES DE BASE (Gullstalgie) jaaj
+// 📌 LISTE DES PROGRAMMES DE BASE (Gullstalgie)
 // =================================================================
 const MES_LIENS = [
     { id: "oggy", title: "Oggy et les Cafards - Compil", url: "https://www.youtube.com/watch?v=d0b4rOQYA3s", duration: 1619 },
