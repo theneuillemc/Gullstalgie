@@ -23,8 +23,7 @@ const state = {
   started: false,
   adminOverride: null,
   ytPlayer: null,
-  currentMediaUrl: null,
-  subtitlesEnabled: false
+  currentMediaUrl: null
 };
 
 const refs = {
@@ -191,23 +190,6 @@ function handleMediaEnded() {
   updateDirectSync();
 }
 
-function applySubtitlesState() {
-  if (state.ytPlayer && typeof state.ytPlayer.loadModule === "function") {
-    if (state.subtitlesEnabled) {
-      state.ytPlayer.loadModule("captions");
-      try {
-        const tracks = state.ytPlayer.getOption("captions", "tracklist");
-        if (tracks && tracks.length > 0) {
-          const frTrack = tracks.find(t => t.languageCode === 'fr') || tracks[0];
-          state.ytPlayer.setOption("captions", "track", frTrack);
-        }
-      } catch (e) {}
-    } else {
-      state.ytPlayer.unloadModule("captions");
-    }
-  }
-}
-
 function renderMediaSync(media, seekOffset) {
   if (state.currentMediaUrl === media.url && state.ytPlayer) {
     try {
@@ -262,7 +244,7 @@ function renderMediaSync(media, seekOffset) {
           modestbranding: 1, 
           playsinline: 1, 
           rel: 0,
-          cc_load_policy: state.subtitlesEnabled ? 1 : 0,
+          cc_load_policy: 0,
           hl: 'fr',
           start: Math.floor(seekOffset)
         },
@@ -271,14 +253,12 @@ function renderMediaSync(media, seekOffset) {
             clearTimeout(safetyTimer);
             e.target.setPlaybackQuality('hd1080');
             e.target.seekTo(seekOffset, true);
-            applySubtitlesState();
             e.target.playVideo();
           },
           onStateChange: (e) => {
             if (e.data === YT.PlayerState.PLAYING) {
               clearTimeout(safetyTimer);
               e.target.setPlaybackQuality('hd1080');
-              applySubtitlesState();
               fallbackBtn.style.display = "none";
             }
             if (e.data === YT.PlayerState.ENDED) {
@@ -290,9 +270,8 @@ function renderMediaSync(media, seekOffset) {
     });
   } else {
     const ytId = extractYoutubeId(media.url);
-    const ccVal = state.subtitlesEnabled ? 1 : 0;
     const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=${ccVal}&vq=hd1080&start=${Math.floor(seekOffset)}`;
+    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&vq=hd1080&start=${Math.floor(seekOffset)}`;
     iframe.style.cssText = "width:100%;height:100%;border:0;";
     refs.mediaStage.appendChild(iframe);
   }
@@ -318,48 +297,8 @@ function startProgram() {
   updateDirectSync();
 }
 
-function initSubtitlesButton() {
-  const subBtn = document.createElement("button");
-  subBtn.id = "toggle-subtitles-btn";
-  subBtn.textContent = "💬 Sous-titres : OFF";
-  subBtn.style.cssText = `
-    position: fixed;
-    top: 75px;
-    left: 15px;
-    z-index: 10000;
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
-    border: 2px solid #555;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-family: inherit;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: background 0.2s, border-color 0.2s;
-  `;
-
-  subBtn.onmouseover = () => { subBtn.style.background = "rgba(50, 50, 50, 0.9);"; subBtn.style.borderColor = "#888"; };
-  subBtn.onmouseout = () => { subBtn.style.background = "rgba(0, 0, 0, 0.75);"; subBtn.style.borderColor = "#555"; };
-
-  subBtn.addEventListener("click", () => {
-    state.subtitlesEnabled = !state.subtitlesEnabled;
-    if (state.subtitlesEnabled) {
-      subBtn.textContent = "💬 Sous-titres : ON";
-      subBtn.style.borderColor = "#2ecc71";
-    } else {
-      subBtn.textContent = "💬 Sous-titres : OFF";
-      subBtn.style.borderColor = "#555";
-    }
-    applySubtitlesState();
-  });
-
-  document.body.appendChild(subBtn);
-}
-
 function init() {
   refs.startButton?.addEventListener("click", startProgram);
-  initSubtitlesButton();
   updateDirectSync();
   setInterval(updateDirectSync, 1000); 
 }
