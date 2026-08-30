@@ -222,7 +222,6 @@ function handleMediaEnded() {
     state.adminForcedMedia = null;
   }
 
-  // Si on est en mode direct synchro, forcer l'index sur la file d'attente à l'élément suivant
   const currentActive = getActiveMediaForCurrentTime();
   const currentIndex = queue.findIndex(m => m.url === currentActive.media.url);
   if (currentIndex !== -1) {
@@ -288,6 +287,8 @@ function renderMediaSync(media, seekOffset) {
           modestbranding: 1, 
           playsinline: 1, 
           rel: 0,
+          cc_load_policy: 0,
+          hl: 'fr',
           start: Math.floor(seekOffset)
         },
         events: {
@@ -324,7 +325,7 @@ function renderMediaSync(media, seekOffset) {
   } else {
     const ytId = extractYoutubeId(media.url);
     const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&start=${Math.floor(seekOffset)}`;
+    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&start=${Math.floor(seekOffset)}`;
     iframe.style.cssText = "width:100%;height:100%;border:0;";
     refs.mediaStage.appendChild(iframe);
   }
@@ -433,7 +434,6 @@ function populateAdminVideoList() {
     const wrapper = document.createElement("div");
     wrapper.style.cssText = "margin-top:20px; border-top:1px solid #444; padding-top:15px;";
 
-    // Bouton de retour au direct
     if (!document.getElementById("adm-return-live")) {
       const newLiveBtn = document.createElement("button");
       newLiveBtn.id = "adm-return-live";
@@ -451,7 +451,6 @@ function populateAdminVideoList() {
       wrapper.appendChild(newLiveBtn);
     }
 
-    // BOUTON "PASSER" QUI VA AU MÉDIA SUIVANT
     if (!document.getElementById("adm-skip-next")) {
       const skipBtn = document.createElement("button");
       skipBtn.id = "adm-skip-next";
@@ -464,7 +463,6 @@ function populateAdminVideoList() {
       wrapper.appendChild(skipBtn);
     }
 
-    // Boutons de test rapide
     const testPresenteBtn = document.createElement("button");
     testPresenteBtn.textContent = "▶ Test Gulli Présente ➔ Dessin Animé";
     testPresenteBtn.style.cssText = "width:100%; padding:8px; background:#8e44ad; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:12px;";
