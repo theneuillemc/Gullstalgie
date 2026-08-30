@@ -2,15 +2,15 @@
 // 📌 LISTE DES PROGRAMMES DE BASE (Gullstalgie)
 // =================================================================
 const MES_LIENS = [
-    { id: "oggy", title: "Oggy et les Cafards - Compil", url: "https://www.youtube.com/watch?v=d0b4rOQYA3s", duration: 1320 },
+    { id: "oggy", title: "Oggy et les Cafards - Compil", url: "https://www.youtube.com/watch?v=d0b4rOQYA3s", duration: 1619 },
     { id: "zig1", title: "Zig et Sharko - Compil 1", url: "https://www.youtube.com/watch?v=PQwwHx-oMLQ", duration: 1320 },
-    { id: "zig2", title: "Zig et Sharko - Compil 2", url: "https://youtu.be/Tth57ZeRT2M", duration: 1320 },
-    { id: "spies", title: "Totally Spies - Compil", url: "https://www.youtube.com/watch?v=5gWKb_cvjgo", duration: 1320 },
-    { id: "foot1", title: "Foot de Rue - Compil 1", url: "https://www.youtube.com/watch?v=OalJZhbmO8E", duration: 1320 },
-    { id: "foot2", title: "Foot de Rue - Compil 2", url: "https://www.youtube.com/watch?v=uujM_Tj5j7Y", duration: 1320 },
-    { id: "dalton", title: "Les Dalton - Compil", url: "https://www.youtube.com/watch?v=gwJkgB9pIbo", duration: 1320 },
-    { id: "mbc1", title: "Monster Buster Club - Compil 1", url: "https://www.youtube.com/watch?v=w6rJSEjLslE", duration: 1320 },
-    { id: "mbc2", title: "Monster Buster Club - Compil 2", url: "https://www.youtube.com/watch?v=kM4rUc6Pcr8", duration: 1320 }
+    { id: "zig2", title: "Zig et Sharko - Compil 2", url: "https://youtu.be/Tth57ZeRT2M", duration: 862 },
+    { id: "spies", title: "Totally Spies - Compil", url: "https://www.youtube.com/watch?v=5gWKb_cvjgo", duration: 1328 },
+    { id: "foot1", title: "Foot de Rue - Compil 1", url: "https://www.youtube.com/watch?v=OalJZhbmO8E", duration: 1448 },
+    { id: "foot2", title: "Foot de Rue - Compil 2", url: "https://www.youtube.com/watch?v=uujM_Tj5j7Y", duration: 1305 },
+    { id: "dalton", title: "Les Dalton - Compil", url: "https://www.youtube.com/watch?v=gwJkgB9pIbo", duration: 2358 },
+    { id: "mbc1", title: "Monster Buster Club - Compil 1", url: "https://www.youtube.com/watch?v=w6rJSEjLslE", duration: 1906 },
+    { id: "mbc2", title: "Monster Buster Club - Compil 2", url: "https://www.youtube.com/watch?v=kM4rUc6Pcr8", duration: 1306 }
 ];
 
 const PROGRAMME_NUIT = {
