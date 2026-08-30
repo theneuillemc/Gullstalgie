@@ -22,6 +22,9 @@ const PROGRAMME_NUIT = {
 const state = {
   started: false,
   adminOverride: null,
+  adminForcedMedia: null,
+  adminChainIndex: null,
+  adminChainEnd: null,
   ytPlayer: null,
   currentMediaUrl: null
 };
@@ -148,6 +151,15 @@ function computeMode(currentMins) {
 
 function getActiveMediaForCurrentTime() {
   const queue = buildDayQueue();
+
+  if (state.adminChainIndex !== null) {
+    return { media: queue[state.adminChainIndex], seekOffset: 0 };
+  }
+
+  if (state.adminForcedMedia) {
+    return { media: state.adminForcedMedia, seekOffset: 0 };
+  }
+
   const currentMins = getCurrentMinutes();
   const mode = computeMode(currentMins);
 
@@ -187,6 +199,36 @@ function destroyCurrentYtPlayer() {
 }
 
 function handleMediaEnded() {
+  const queue = buildDayQueue();
+  if (state.adminChainIndex !== null) {
+    if (state.adminChainEnd !== null && state.adminChainIndex >= state.adminChainEnd) {
+      state.adminChainIndex = null;
+      state.adminChainEnd = null;
+      updateDirectSync();
+      return;
+    }
+    state.adminChainIndex++;
+    if (state.adminChainIndex >= queue.length) {
+      state.adminChainIndex = null;
+      state.adminChainEnd = null;
+    }
+    state.currentMediaUrl = null;
+    updateDirectSync();
+    return;
+  }
+
+  if (state.adminForcedMedia) {
+    state.adminForcedMedia = null;
+  }
+
+  const currentActive = getActiveMediaForCurrentTime();
+  const currentIndex = queue.findIndex(m => m.url === currentActive.media.url);
+  if (currentIndex !== -1) {
+    state.adminChainIndex = (currentIndex + 1) % queue.length;
+    state.adminChainEnd = null;
+  }
+
+  state.currentMediaUrl = null;
   updateDirectSync();
 }
 
@@ -297,8 +339,182 @@ function startProgram() {
   updateDirectSync();
 }
 
+function initAdminPanel() {
+  const overlay = document.getElementById("admin-panel-overlay");
+  const openBtn = document.getElementById("open-admin-btn");
+  const closeBtn = document.getElementById("close-admin-btn");
+  const loginBtn = document.getElementById("admin-login-btn");
+  const passInput = document.getElementById("admin-pass-input");
+  const loginContainer = document.getElementById("admin-login-container");
+  const controlsContainer = document.getElementById("admin-controls-container");
+  const errorMsg = document.getElementById("admin-error-msg");
+
+  if (!overlay || !openBtn) return;
+
+  openBtn.addEventListener("click", () => {
+    overlay.classList.remove("hidden");
+    if (passInput) passInput.value = "";
+    if (errorMsg) errorMsg.style.display = "none";
+  });
+
+  closeBtn?.addEventListener("click", () => overlay.classList.add("hidden"));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.add("hidden"); });
+
+  function verifyCode() {
+    if (passInput.value === "madname44") {
+      loginContainer.style.display = "none";
+      controlsContainer.style.display = "block";
+      populateAdminVideoList();
+    } else {
+      if (errorMsg) errorMsg.style.display = "block";
+      passInput?.focus();
+    }
+  }
+
+  loginBtn?.addEventListener("click", verifyCode);
+  passInput?.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyCode(); });
+
+  document.getElementById("adm-restart-btn")?.addEventListener("click", () => { updateDirectSync(); overlay.classList.add("hidden"); });
+  document.getElementById("adm-clear-storage-btn")?.addEventListener("click", () => { localStorage.clear(); alert("Cache vidé !"); });
+
+  document.getElementById("adm-apply-time")?.addEventListener("click", () => {
+    const val = document.getElementById("adm-time-input").value;
+    if (val) { 
+      state.adminOverride = val; 
+      state.adminChainIndex = null;
+      state.adminChainEnd = null;
+      state.adminForcedMedia = null;
+      updateDirectSync(); 
+      alert(`Heure fixée à : ${val}`); 
+    }
+  });
+
+  document.getElementById("adm-reset-time")?.addEventListener("click", () => {
+    state.adminOverride = null;
+    state.adminChainIndex = null;
+    state.adminChainEnd = null;
+    state.adminForcedMedia = null;
+    const timeInput = document.getElementById("adm-time-input");
+    if (timeInput) timeInput.value = "";
+    updateDirectSync();
+    alert("Retour à l'heure réelle.");
+  });
+
+  document.getElementById("adm-toggle-mute")?.addEventListener("click", () => {
+    if (state.ytPlayer && typeof state.ytPlayer.isMuted === "function") {
+      state.ytPlayer.isMuted() ? state.ytPlayer.unMute() : state.ytPlayer.mute();
+    } else {
+      alert("Actif sur le lecteur YouTube en cours.");
+    }
+  });
+
+  document.getElementById("adm-log-state")?.addEventListener("click", () => {
+    console.log("État Gullstalgie:", state);
+    alert("État affiché dans la console (F12) !");
+  });
+}
+
+function populateAdminVideoList() {
+  let listContainer = document.getElementById("admin-video-list");
+  if (!listContainer) {
+    const controlsContainer = document.getElementById("admin-controls-container");
+    if (!controlsContainer) return;
+    
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = "margin-top:20px; border-top:1px solid #444; padding-top:15px;";
+
+    if (!document.getElementById("adm-return-live")) {
+      const newLiveBtn = document.createElement("button");
+      newLiveBtn.id = "adm-return-live";
+      newLiveBtn.textContent = "🔴 RETOUR AU DIRECT SYNCHRO";
+      newLiveBtn.style.cssText = "width:100%; padding:10px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:10px;";
+      newLiveBtn.addEventListener("click", () => {
+        state.adminChainIndex = null;
+        state.adminChainEnd = null;
+        state.adminForcedMedia = null;
+        state.currentMediaUrl = null;
+        updateDirectSync();
+        document.getElementById("admin-panel-overlay").classList.add("hidden");
+        alert("Retour au direct synchro activé !");
+      });
+      wrapper.appendChild(newLiveBtn);
+    }
+
+    if (!document.getElementById("adm-skip-next")) {
+      const skipBtn = document.createElement("button");
+      skipBtn.id = "adm-skip-next";
+      skipBtn.textContent = "⏭ Passer au média suivant";
+      skipBtn.style.cssText = "width:100%; padding:10px; background:#3498db; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:15px;";
+      skipBtn.addEventListener("click", () => {
+        handleMediaEnded();
+        document.getElementById("admin-panel-overlay").classList.add("hidden");
+      });
+      wrapper.appendChild(skipBtn);
+    }
+
+    const testPresenteBtn = document.createElement("button");
+    testPresenteBtn.textContent = "▶ Test Gulli Présente ➔ Dessin Animé";
+    testPresenteBtn.style.cssText = "width:100%; padding:8px; background:#8e44ad; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:12px;";
+    testPresenteBtn.addEventListener("click", () => {
+      state.adminChainIndex = 0; 
+      state.adminChainEnd = 1;   
+      state.adminForcedMedia = null;
+      state.currentMediaUrl = null;
+      updateDirectSync();
+      document.getElementById("admin-panel-overlay").classList.add("hidden");
+    });
+    wrapper.appendChild(testPresenteBtn);
+
+    const testPubBtn = document.createElement("button");
+    testPubBtn.textContent = "▶ Test Gulli Pub ➔ Charger les Pubs";
+    testPubBtn.style.cssText = "width:100%; padding:8px; background:#d35400; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:12px; font-size:12px;";
+    testPubBtn.addEventListener("click", () => {
+      state.adminChainIndex = 2; 
+      state.adminChainEnd = 4;   
+      state.adminForcedMedia = null;
+      state.currentMediaUrl = null;
+      updateDirectSync();
+      document.getElementById("admin-panel-overlay").classList.add("hidden");
+    });
+    wrapper.appendChild(testPubBtn);
+
+    const title = document.createElement("h4");
+    title.textContent = "Tester un dessin animé de la liste :";
+    title.style.cssText = "color:white; margin-bottom:8px; font-size:14px;";
+    wrapper.appendChild(title);
+
+    listContainer = document.createElement("div");
+    listContainer.id = "admin-video-list";
+    listContainer.style.cssText = "max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;";
+    wrapper.appendChild(listContainer);
+    
+    controlsContainer.appendChild(wrapper);
+  }
+
+  listContainer.innerHTML = "";
+  MES_LIENS.forEach((media, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = `${index + 1}. ${media.title}`;
+    btn.style.cssText = "text-align:left; padding:6px 10px; background:#2c3e50; color:white; border:none; border-radius:4px; cursor:pointer; font-size:12px;";
+    btn.onmouseover = () => btn.style.background = "#34495e";
+    btn.onmouseout = () => btn.style.background = "#2c3e50";
+    
+    btn.addEventListener("click", () => {
+      state.adminChainIndex = null;
+      state.adminChainEnd = null;
+      state.adminForcedMedia = media;
+      state.currentMediaUrl = null;
+      updateDirectSync();
+      document.getElementById("admin-panel-overlay").classList.add("hidden");
+    });
+
+    listContainer.appendChild(btn);
+  });
+}
+
 function init() {
   refs.startButton?.addEventListener("click", startProgram);
+  initAdminPanel();
   updateDirectSync();
   setInterval(updateDirectSync, 1000); 
 }
