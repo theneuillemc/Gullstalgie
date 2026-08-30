@@ -349,13 +349,16 @@ function initAdminPanel() {
   const controlsContainer = document.getElementById("admin-controls-container");
   const errorMsg = document.getElementById("admin-error-msg");
 
-  if (!overlay || !openBtn) return;
+  if (!overlay || !openBtn) {
+    console.warn("Panneau admin ou bouton d'ouverture introuvable dans le DOM.");
+    return;
+  }
 
-  openBtn.addEventListener("click", () => {
+  openBtn.onclick = () => {
     overlay.classList.remove("hidden");
     if (passInput) passInput.value = "";
     if (errorMsg) errorMsg.style.display = "none";
-  });
+  };
 
   closeBtn?.addEventListener("click", () => overlay.classList.add("hidden"));
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.add("hidden"); });
