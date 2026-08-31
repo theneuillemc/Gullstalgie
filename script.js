@@ -107,6 +107,7 @@ function buildDayQueue() {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
 
+  // Anti-doublon strict consécutif
   for (let i = 0; i < pool.length - 1; i++) {
     if (pool[i].id === pool[i+1].id) {
       for (let k = i + 2; k < pool.length; k++) {
@@ -120,9 +121,9 @@ function buildDayQueue() {
 
   const finalQueue = [];
   pool.forEach((item, index) => {
-    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 8 });
+    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 7 });
     finalQueue.push(item);
-    finalQueue.push({ title: "Jingle Pub", url: "https://www.youtube.com/watch?v=YSks9u1s7rw", duration: 7 });
+    finalQueue.push({ title: "Jingle Pub", url: "https://www.youtube.com/watch?v=YSks9u1s7rw", duration: 6 });
     
     if (index % 2 === 0) {
       finalQueue.push({ title: "Pub P'tit Filou Tub's", url: "https://www.youtube.com/watch?v=YhcQvxoq0O0", duration: 16 });
@@ -289,6 +290,7 @@ function renderMediaSync(media, seekOffset) {
           rel: 0,
           cc_load_policy: 0,
           hl: 'fr',
+          iv_load_policy: 3,
           start: Math.floor(seekOffset)
         },
         events: {
@@ -300,6 +302,36 @@ function renderMediaSync(media, seekOffset) {
             if (typeof e.target.unloadModule === "function") {
               e.target.unloadModule("captions");
             }
+
+            // Surveillance anti-pub propre sans casser le direct (mute + skip auto si possible)
+            const adWatchInterval = setInterval(() => {
+              try {
+                const iframe = document.querySelector(`#${slotId} iframe`);
+                if (iframe && iframe.contentDocument) {
+                  const doc = iframe.contentDocument;
+                  const skipBtn = doc.querySelector('.ytp-ad-skip-button, .ytp-ad-skip-button-text');
+                  const adBadge = doc.querySelector('.ytp-ad-player-overlay, .video-ads');
+                  
+                  if (skipBtn) {
+                    skipBtn.click();
+                  }
+                  
+                  if (adBadge) {
+                    if (typeof e.target.isMuted === "function" && !e.target.isMuted()) {
+                      e.target.mute();
+                    }
+                  } else {
+                    if (typeof e.target.isMuted === "function" && e.target.isMuted()) {
+                      e.target.unMute();
+                      e.target.seekTo(seekOffset, true);
+                    }
+                    clearInterval(adWatchInterval);
+                  }
+                }
+              } catch (err) {}
+            }, 400);
+
+            setTimeout(() => clearInterval(adWatchInterval), 12000);
           },
           onStateChange: (e) => {
             if (e.data === YT.PlayerState.PLAYING) {
@@ -320,7 +352,7 @@ function renderMediaSync(media, seekOffset) {
   } else {
     const ytId = extractYoutubeId(media.url);
     const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&vq=hd1080&start=${Math.floor(seekOffset)}`;
+    iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&controls=0&disablekb=1&cc_load_policy=0&iv_load_policy=3&vq=hd1080&start=${Math.floor(seekOffset)}`;
     iframe.style.cssText = "width:100%;height:100%;border:0;";
     refs.mediaStage.appendChild(iframe);
   }
