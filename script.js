@@ -107,7 +107,6 @@ function buildDayQueue() {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
 
-  // Anti-doublon strict consécutif
   for (let i = 0; i < pool.length - 1; i++) {
     if (pool[i].id === pool[i+1].id) {
       for (let k = i + 2; k < pool.length; k++) {
@@ -121,12 +120,12 @@ function buildDayQueue() {
 
   const finalQueue = [];
   pool.forEach((item, index) => {
-    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 7 });
+    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 8 });
     finalQueue.push(item);
     finalQueue.push({ title: "Jingle Pub", url: "https://www.youtube.com/watch?v=YSks9u1s7rw", duration: 7 });
     
     if (index % 2 === 0) {
-      finalQueue.push({ title: "Pub P'tit Filou Tub's", url: "https://www.youtube.com/watch?v=YhcQvxoq0O0", duration: 18 });
+      finalQueue.push({ title: "Pub P'tit Filou Tub's", url: "https://www.youtube.com/watch?v=YhcQvxoq0O0", duration: 16 });
     } else {
       finalQueue.push({ title: "Pub Miel Pops", url: "https://www.youtube.com/watch?v=dgXkrRkFZ18", duration: 35 });
     }
@@ -165,15 +164,16 @@ function getActiveMediaForCurrentTime() {
   const mode = computeMode(currentMins);
 
   const now = new Date();
-  const secondsSinceMidnight = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
+  // Utilisation d'un temps global en secondes (depuis une date de référence fixe) pour éviter la réinitialisation matinale
+  const totalSeconds = Math.floor(now.getTime() / 1000);
 
   if (mode === "night") {
-    const seekOffset = secondsSinceMidnight % PROGRAMME_NUIT.duration;
+    const seekOffset = totalSeconds % PROGRAMME_NUIT.duration;
     return { media: PROGRAMME_NUIT, seekOffset };
   }
 
   const totalPlaylistDuration = queue.reduce((acc, m) => acc + m.duration, 0) || 3600;
-  const elapsedSecondsTotal = secondsSinceMidnight % totalPlaylistDuration;
+  const elapsedSecondsTotal = totalSeconds % totalPlaylistDuration;
 
   let accumulated = 0;
   let activeMedia = queue[0];
