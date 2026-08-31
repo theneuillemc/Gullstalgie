@@ -121,12 +121,12 @@ function buildDayQueue() {
 
   const finalQueue = [];
   pool.forEach((item, index) => {
-    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 7 });
+    finalQueue.push({ title: "Jingle Gullstalgie Présente", url: "https://www.youtube.com/watch?v=U8A3A0LpniM", duration: 8 });
     finalQueue.push(item);
-    finalQueue.push({ title: "Jingle Pub", url: "https://www.youtube.com/watch?v=YSks9u1s7rw", duration: 6 });
+    finalQueue.push({ title: "Jingle Pub", url: "https://www.youtube.com/watch?v=YSks9u1s7rw", duration: 7 });
     
     if (index % 2 === 0) {
-      finalQueue.push({ title: "Pub P'tit Filou Tub's", url: "https://www.youtube.com/watch?v=YhcQvxoq0O0", duration: 16 });
+      finalQueue.push({ title: "Pub P'tit Filou Tub's", url: "https://www.youtube.com/watch?v=YhcQvxoq0O0", duration: 17 });
     } else {
       finalQueue.push({ title: "Pub Miel Pops", url: "https://www.youtube.com/watch?v=dgXkrRkFZ18", duration: 35 });
     }
